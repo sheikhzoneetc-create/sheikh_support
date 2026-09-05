@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>ব্যবহারের নির্দেশিকা</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background: #0b1329; color: #f8fafc; margin: 0; padding: 14px; }
+    .box { background: #162032; padding: 16px; border-radius: 12px; border: 1px solid #233554; }
+    h3 { margin: 0 0 10px; color: #38bdf8; font-size: 16px; }
+    p { margin: 0 0 14px; color: #cbd5e1; font-size: 13px; }
+    .slider-card { background: #1e293b; border: 1px solid #3b82f6; border-radius: 10px; padding: 14px; margin-bottom: 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+    .slider-card span { font-size: 14px; font-weight: 500; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); z-index: 99; padding: 15px; }
+    .modal-body { background: #162032; border-radius: 12px; padding: 16px; margin-top: 20px; border: 1px solid #334155; text-align: center; }
+    .modal-img { width: 100%; max-height: 240px; object-fit: contain; border-radius: 8px; background: #0b1329; margin-bottom: 12px; }
+    .nav-slider { display: flex; justify-content: space-between; gap: 10px; margin-top: 15px; }
+    .nav-slider button { flex: 1; padding: 10px; border: none; border-radius: 6px; font-weight: bold; background: #334155; color: #fff; }
+  </style>
+</head>
+<body>
+
+  <div class="box">
+    <h3>📖 ব্যবহারের নির্দেশিকা</h3>
+    <p>নিচে চাপ দিয়ে প্রতিটি কাজের নিয়ম ধাপে ধাপে দেখে নিন:</p>
+    
+    <div class="slider-card" onclick="startSlider('login_guide')">
+      <span>🔐 একাউন্টে লগইন করার নিয়ম</span>
+      <span>👉 দেখুন</span>
+    </div>
+
+    <div class="slider-card" onclick="startSlider('wallet_guide')">
+      <span>💳 ওয়ালেটে টাকা অ্যাড করার নিয়ম</span>
+      <span>👉 দেখুন</span>
+    </div>
+
+    <div class="slider-card" onclick="startSlider('order_guide')">
+      <span>🛒 প্যাকেজ অর্ডার করার নিয়ম</span>
+      <span>👉 দেখুন</span>
+    </div>
+  </div>
+
+  <div id="sliderModal" class="modal">
+    <div class="modal-body">
+      <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+        <span id="stepCounter" style="color:#38bdf8; font-weight:bold;">ধাপ ১/৩</span>
+        <button onclick="closeSlider()" style="background:none; border:none; color:#ef4444; font-size:18px; font-weight:bold;">✕ বন্ধ</button>
+      </div>
+      <img id="slideImg" class="modal-img" src="" alt="Guide Step">
+      <h4 id="slideTitle" style="margin:5px 0; color:#38bdf8;"></h4>
+      <p id="slideDesc" style="color:#cbd5e1; font-size:13px;"></p>
+      <div class="nav-slider">
+        <button id="prevBtn" onclick="changeSlide(-1)">⬅️ আগের ধাপ</button>
+        <button id="nextBtn" onclick="changeSlide(1)">পরবর্তী ধাপ ➡️</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
+    const guidesData = {
+      login_guide: [
+        { title: "জিমেইল দিন", desc: "আপনার একাউন্টের সঠিক জিমেইল লিখুন।", img: "https://via.placeholder.com/400x250/1e293b/38bdf8?text=Step+1:+Email" },
+        { title: "পাসওয়ার্ড দিন", desc: "আপনার পাসওয়ার্ড দিন।", img: "https://via.placeholder.com/400x250/1e293b/38bdf8?text=Step+2:+Password" },
+        { title: "লগইন সম্পন্ন", desc: "লগইন বাটনে ক্লিক করে একাউন্টে প্রবেশ করুন।", img: "https://via.placeholder.com/400x250/1e293b/38bdf8?text=Step+3:+Login" }
+      ],
+      wallet_guide: [
+        { title: "Add Money পেজ", desc: "মেনু থেকে Add Money অপশনে প্রবেশ করুন।", img: "https://via.placeholder.com/400x250/1e293b/38bdf8?text=Step+1:+Add+Money" },
+        { title: "টাকা পাঠান", desc: "নির্দিষ্ট নাম্বারে বিকাশ বা নগদে সেন্ড মানি করুন।", img: "https://via.placeholder.com/400x250/1e293b/38bdf8?text=Step+2:+Send+Money" },
+        { title: "TrxID সাবমিট", desc: "টাকার পরিমাণ ও TrxID লিখে নিশ্চিত করুন।", img: "https://via.placeholder.com/400x250/1e293b/38bdf8?text=Step+3:+Confirm" }
+      ],
+      order_guide: [
+        { title: "অফার সিলেক্ট", desc: "আপনার পছন্দের প্যাকেজ বা অফারটি বাছাই করুন।", img: "https://via.placeholder.com/400x250/1e293b/38bdf8?text=Step+1:+Select" },
+        { title: "মোবাইল নাম্বার", desc: "যে নাম্বারে অফার নিতে চান সেই নাম্বার দিন।", img: "https://via.placeholder.com/400x250/1e293b/38bdf8?text=Step+2:+Number" },
+        { title: "অর্ডার সফল", desc: "পেমেন্ট নিশ্চিত করলে কিছুক্ষণের মধ্যে অফার চালু হবে।", img: "https://via.placeholder.com/400x250/1e293b/38bdf8?text=Step+3:+Done" }
+      ]
+    };
+
+    let currentGuide = [];
+    let currentIndex = 0;
+
+    function startSlider(key) {
+      currentGuide = guidesData[key];
+      currentIndex = 0;
+      renderSlide();
+      document.getElementById('sliderModal').style.display = 'block';
+    }
+
+    function renderSlide() {
+      const step = currentGuide[currentIndex];
+      document.getElementById('stepCounter').innerText = `ধাপ ${currentIndex + 1}/${currentGuide.length}`;
+      document.getElementById('slideImg').src = step.img;
+      document.getElementById('slideTitle').innerText = step.title;
+      document.getElementById('slideDesc').innerText = step.desc;
+      document.getElementById('prevBtn').disabled = (currentIndex === 0);
+      document.getElementById('nextBtn').innerText = (currentIndex === currentGuide.length - 1) ? "সমাপ্ত ✅" : "পরবর্তী ধাপ ➡️";
+    }
+
+    function changeSlide(dir) {
+      if (dir === 1 && currentIndex === currentGuide.length - 1) {
+        closeSlider();
+        return;
+      }
+      currentIndex += dir;
+      renderSlide();
+    }
+
+    function closeSlider() {
+      document.getElementById('sliderModal').style.display = 'none';
+    }
+  </script>
+</body>
+</html>
