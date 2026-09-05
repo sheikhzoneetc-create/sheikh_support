@@ -13,8 +13,8 @@
     label { display: block; margin: 12px 0 5px; font-size: 13px; color: #94a3b8; font-weight: 600; }
     .optional-tag { color: #64748b; font-weight: normal; font-size: 11px; }
     input, textarea { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #334155; background: #0b1329; color: #fff; font-size: 14px; }
-    input[type="file"] { padding: 9px; background: #1e293b; }
     .btn-green { width: 100%; padding: 14px; background: #10b981; border: none; border-radius: 8px; color: #fff; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 18px; }
+    .note { margin-top: 12px; font-size: 12px; color: #94a3b8; text-align: center; }
   </style>
 </head>
 <body>
@@ -34,10 +34,8 @@
       <label>সমস্যার বিস্তারিত বিবরণ: <span style="color:#ef4444;">*</span></label>
       <textarea id="cust_issue" rows="4" required placeholder="কী সমস্যা হচ্ছে বিস্তারিত লিখুন..."></textarea>
 
-      <label>সমস্যার স্ক্রিনশট: <span class="optional-tag">(ঐচ্ছিক)</span></label>
-      <input type="file" id="cust_file" accept="image/*">
-
       <button type="submit" id="submitBtn" class="btn-green">পাঠিয়ে দিন</button>
+      <div class="note">📷 স্ক্রিনশট থাকলে ফর্ম জমা দেওয়ার পর চ্যাটে পাঠাতে পারবেন।</div>
     </form>
   </div>
 
@@ -51,19 +49,10 @@
       const phone = document.getElementById('cust_phone').value.trim();
       const email = document.getElementById('cust_email').value.trim() || 'দেওয়া হয়নি';
       const issue = document.getElementById('cust_issue').value.trim();
-      const file = document.getElementById('cust_file').files[0];
 
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-          tg.sendData(JSON.stringify({ name, phone, email, issue, photo: evt.target.result }));
-          tg.close();
-        };
-        reader.readAsDataURL(file);
-      } else {
-        tg.sendData(JSON.stringify({ name, phone, email, issue, photo: null }));
-        tg.close();
-      }
+      // ছোট ও নিখুঁত ডেটা পাঠানো হচ্ছে যেন টেলিগ্রাম আটকে না দেয়
+      tg.sendData(JSON.stringify({ name, phone, email, issue }));
+      tg.close();
     });
   </script>
 </body>
