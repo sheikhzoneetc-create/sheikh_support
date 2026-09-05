@@ -8,8 +8,8 @@
   <style>
     * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { background: #0b1329; color: #f8fafc; margin: 0; padding: 12px; }
-    .nav-tabs { display: flex; gap: 6px; margin-bottom: 15px; }
-    .tab-btn { flex: 1; padding: 12px 6px; border: none; background: #1e293b; color: #94a3b8; font-weight: bold; border-radius: 8px; cursor: pointer; font-size: 13px; text-align: center; }
+    .nav-tabs { display: flex; gap: 8px; margin-bottom: 15px; }
+    .tab-btn { flex: 1; padding: 12px; border: none; background: #1e293b; color: #94a3b8; font-weight: bold; border-radius: 8px; cursor: pointer; font-size: 14px; text-align: center; }
     .tab-btn.active { background: #3b82f6; color: #ffffff; }
     .content-tab { display: none; }
     .content-tab.active { display: block; }
@@ -34,32 +34,18 @@
 <body>
 
   <div class="nav-tabs">
-    <button class="tab-btn" id="btn-login" onclick="openTab('login')">🔐 লগইন</button>
     <button class="tab-btn active" id="btn-guides" onclick="openTab('guides')">📖 নির্দেশিকা</button>
     <button class="tab-btn" id="btn-support" onclick="openTab('support')">🛠️ সমস্যা জানান</button>
   </div>
 
-  <div id="login" class="content-tab">
-    <div class="box">
-      <h3>ওয়েবসাইট একাউন্ট লগইন</h3>
-      <p>আপনার একাউন্টে প্রবেশ করতে তথ্য দিন:</p>
-      <form onsubmit="event.preventDefault(); window.open('https://sheikhzone.com/login', '_blank');">
-        <label>আপনার জিমেইল (Gmail):</label>
-        <input type="email" required placeholder="example@gmail.com">
-        <label>পাসওয়ার্ড:</label>
-        <input type="password" required placeholder="••••••••">
-        <button type="submit" class="btn-green">লগইন করুন</button>
-      </form>
-    </div>
-  </div>
-
+  <!-- নির্দেশিকা ও স্লাইডার -->
   <div id="guides" class="content-tab active">
     <div class="box">
       <h3>ব্যবহারের নির্দেশিকা</h3>
       <p>যেকোনো বিষয়ের ওপর চাপ দিলে ধাপে ধাপে ছবি ও বিবরণ দেখতে পাবেন:</p>
       
       <div class="slider-card" onclick="startSlider('login_guide')">
-        <span>🔐 কীভাবে লগইন করবেন?</span>
+        <span>🔐 কীভাবে ওয়েবসাইটে লগইন করবেন?</span>
         <span>👉 দেখুন</span>
       </div>
 
@@ -75,6 +61,7 @@
     </div>
   </div>
 
+  <!-- স্লাইডার পপ-আপ -->
   <div id="sliderModal" class="modal">
     <div class="modal-body">
       <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
@@ -93,6 +80,7 @@
     </div>
   </div>
 
+  <!-- কাস্টমার সাপোর্ট টিকিট -->
   <div id="support" class="content-tab">
     <div class="box">
       <h3>সাপোর্ট টিকিট সাবমিট</h3>
@@ -106,7 +94,7 @@
         <label>সমস্যার বিস্তারিত লিখুন:</label>
         <textarea id="cust_issue" rows="4" required placeholder="কী সমস্যা হচ্ছে বিস্তারিত বলুন..."></textarea>
 
-        <label>স্ক্রিনশট ছবি (ঐচ্ছিক):</label>
+        <label>স্ক্রিনশট ছবি (প্রয়োজনে দিন):</label>
         <input type="file" id="cust_file" accept="image/*">
 
         <button type="submit" id="submitBtn" class="btn-green">এডমিনের কাছে পাঠান</button>
@@ -129,8 +117,7 @@
       document.getElementById(tabId).classList.add('active');
     }
 
-    if (window.location.hash === "#login") openTab('login');
-    else if (window.location.hash === "#support") openTab('support');
+    if (window.location.hash === "#support") openTab('support');
     else openTab('guides');
 
     const guidesData = {
