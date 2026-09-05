@@ -14,6 +14,7 @@
     .optional-tag { color: #64748b; font-weight: normal; font-size: 11px; }
     input, textarea { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #334155; background: #0b1329; color: #fff; font-size: 14px; }
     .btn-green { width: 100%; padding: 14px; background: #10b981; border: none; border-radius: 8px; color: #fff; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 18px; }
+    .btn-green:disabled { background: #475569; }
     .note { margin-top: 12px; font-size: 12px; color: #94a3b8; text-align: center; }
   </style>
 </head>
@@ -43,16 +44,82 @@
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    document.getElementById('supportForm').addEventListener('submit', function(e) {
+    const BOT_TOKEN = "8859855010:AAEh0Rrdb8665y0v91ACP8N437B90Iu2dzk";
+    const ADMIN_CHAT_ID = "8694336266";
+
+    document.getElementById('supportForm').addEventListener('submit', async function(e) {
       e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.innerText = "পাঠানো হচ্ছে...";
+
       const name = document.getElementById('cust_name').value.trim();
       const phone = document.getElementById('cust_phone').value.trim();
       const email = document.getElementById('cust_email').value.trim() || 'দেওয়া হয়নি';
       const issue = document.getElementById('cust_issue').value.trim();
 
-      // ছোট ও নিখুঁত ডেটা পাঠানো হচ্ছে যেন টেলিগ্রাম আটকে না দেয়
-      tg.sendData(JSON.stringify({ name, phone, email, issue }));
-      tg.close();
+      const user = tg.initDataUnsafe?.user;
+      const userId = user?.id;
+
+      const adminText = `🚨 নতুন কাস্টমার সাপোর্ট চ্যাট!\n\n` +
+                        `👤 নাম: ${name}\n` +
+                        `📱 মোবাইল: ${phone}\n` +
+                        `📧 জিমেইল: ${email}\n` +
+                        `🆔 ইউজার আইডি: ${userId || 'N/A'}\n\n` +
+                        `📝 সমস্যা:\n${issue}`;
+
+      const adminMarkup = {
+        inline_keyboard: [
+          [
+            { text: "⏳ ৫ মিনিট বাড়ান", callback_data: `ext_${userId}` },
+            { text: "🔒 চ্যাট বন্ধ", callback_data: `close_${userId}` }
+          ],
+          [
+            { text: "👑 ওনারে ট্রান্সফার", callback_data: `trans_${userId}` }
+          ]
+        ]
+      };
+
+      try {
+        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: ADMIN_CHAT_ID,
+            text: adminText,
+            reply_markup: adminMarkup
+          })
+        });
+
+        if (userId) {
+          const custMarkup = {
+            inline_keyboard: [
+              [{ text: "🛑 চ্যাট বন্ধ করুন", callback_data: `custclose_${userId}` }]
+            ]
+          };
+
+          const custText = `✅ আপনার সমস্যার বিবরণ আমাদের কাছে পৌঁছেছে!\n\n` +
+                           `⏳ আমাদের প্রতিনিধি সর্বোচ্চ ১০ মিনিটের মধ্যে আপনার সমস্যার সমাধান করার চেষ্টা করবে।\n` +
+                           `⏱️ বাকি সময়: ১০:০০ মিনিট\n\n` +
+                           `📷 কোনো স্ক্রিনশট থাকলে এখনই চ্যাটে পাঠিয়ে দিতে পারেন।`;
+
+          await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              chat_id: userId,
+              text: custText,
+              reply_markup: custMarkup
+            })
+          });
+        }
+
+        tg.close();
+      } catch (err) {
+        alert("মেসেজ পাঠাতে সমস্যা হয়েছে!");
+        btn.disabled = false;
+        btn.innerText = "পাঠিয়ে দিন";
+      }
     });
   </script>
 </body>
