@@ -1,3 +1,20 @@
+from flask import Flask
+from threading import Thread
+
+app = Flask('')
+
+@app.route('/')
+def home():
+    return "Bot is alive!"
+
+def run():
+    app.run(host='0.0.0.0', port=8080)
+
+def keep_alive():
+    t = Thread(target=run)
+    t.start()
+
+
 import telebot
 from telebot import types
 import time
@@ -386,4 +403,5 @@ def admin_reply_handler(msg):
         bot.reply_to(msg, "⚠️ গ্রাহকের চ্যাট রেকর্ড পাওয়া যায়নি।")
 
 print("বট সফলভাবে চালু হয়েছে এবং সব বাটন নিচে কীবোর্ডে সেট করা হয়েছে...")
+keep_alive()
 bot.infinity_polling()
