@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Sheikh Zone Support</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background: #0b1329; color: #f8fafc; margin: 0; padding: 12px; }
+    .nav-tabs { display: flex; gap: 6px; margin-bottom: 15px; }
+    .tab-btn { flex: 1; padding: 12px 6px; border: none; background: #1e293b; color: #94a3b8; font-weight: bold; border-radius: 8px; cursor: pointer; font-size: 13px; text-align: center; }
+    .tab-btn.active { background: #3b82f6; color: #ffffff; }
+    .content-tab { display: none; }
+    .content-tab.active { display: block; }
+    .box { background: #162032; padding: 16px; border-radius: 12px; border: 1px solid #233554; margin-bottom: 12px; }
+    h3 { margin: 0 0 10px; color: #38bdf8; font-size: 17px; }
+    p { margin: 0 0 10px; color: #cbd5e1; font-size: 14px; line-height: 1.5; }
+    label { display: block; margin: 12px 0 5px; font-size: 13px; color: #94a3b8; font-weight: 600; }
+    input, textarea { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #334155; background: #0b1329; color: #fff; font-size: 14px; }
+    input[type="file"] { padding: 9px; background: #1e293b; }
+    .btn-green { width: 100%; padding: 14px; background: #10b981; border: none; border-radius: 8px; color: #fff; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 15px; }
+    .btn-green:disabled { background: #475569; }
+    .slider-card { background: #1e293b; border: 1px solid #3b82f6; border-radius: 10px; padding: 14px; margin-bottom: 10px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+    .slider-card:hover { background: #24344d; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); z-index: 99; padding: 15px; }
+    .modal-body { background: #162032; border-radius: 12px; padding: 16px; margin-top: 15px; border: 1px solid #334155; text-align: center; }
+    .modal-img { width: 100%; max-height: 240px; object-fit: contain; border-radius: 8px; background: #0b1329; margin-bottom: 12px; border: 1px solid #334155; }
+    .nav-slider { display: flex; justify-content: space-between; gap: 10px; margin-top: 15px; }
+    .nav-slider button { flex: 1; padding: 10px; border: none; border-radius: 6px; font-weight: bold; background: #334155; color: #fff; }
+    .status-msg { margin-top: 12px; text-align: center; font-size: 14px; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <div class="nav-tabs">
+    <button class="tab-btn" id="btn-login" onclick="openTab('login')">🔐 লগইন</button>
+    <button class="tab-btn active" id="btn-guides" onclick="openTab('guides')">📖 নির্দেশিকা</button>
+    <button class="tab-btn" id="btn-support" onclick="openTab('support')">🛠️ সমস্যা জানান</button>
+  </div>
+
+  <div id="login" class="content-tab">
+    <div class="box">
+      <h3>ওয়েবসাইট একাউন্ট লগইন</h3>
+      <p>আপনার একাউন্টে প্রবেশ করতে তথ্য দিন:</p>
+      <form onsubmit="event.preventDefault(); window.open('https://sheikhzone.com/login', '_blank');">
+        <label>আপনার জিমেইল (Gmail):</label>
+        <input type="email" required placeholder="example@gmail.com">
+        <label>পাসওয়ার্ড:</label>
+        <input type="password" required placeholder="••••••••">
+        <button type="submit" class="btn-green">লগইন করুন</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="guides" class="content-tab active">
+    <div class="box">
+      <h3>ব্যবহারের নির্দেশিকা</h3>
+      <p>যেকোনো বিষয়ের ওপর চাপ দিলে ধাপে ধাপে ছবি ও বিবরণ দেখতে পাবেন:</p>
+      
+      <div class="slider-card" onclick="startSlider('login_guide')">
+        <span>🔐 কীভাবে লগইন করবেন?</span>
+        <span>👉 দেখুন</span>
+      </div>
+
+      <div class="slider-card" onclick="startSlider('wallet_guide')">
+        <span>💳 ওয়ালেটে টাকা অ্যাড করবেন কীভাবে?</span>
+        <span>👉 দেখুন</span>
+      </div>
+
+      <div class="slider-card" onclick="startSlider('order_guide')">
+        <span>🛒 কীভাবে অফার / প্যাকেজ অর্ডার করবেন?</span>
+        <span>👉 দেখুন</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="sliderModal" class="modal">
+    <div class="modal-body">
+      <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+        <span id="stepCounter" style="color:#38bdf8; font-weight:bold;">ধাপ ১/৩</span>
+        <button onclick="closeSlider()" style="background:none; border:none; color:#ef4444; font-size:18px; font-weight:bold;">✕ বন্ধ</button>
+      </div>
+
+      <img id="slideImg" class="modal-img" src="" alt="Guide Step">
+      <h4 id="slideTitle" style="margin:5px 0; color:#38bdf8;"></h4>
+      <p id="slideDesc"></p>
+
+      <div class="nav-slider">
+        <button id="prevBtn" onclick="changeSlide(-1)">⬅️ আগের ধাপ</button>
+        <button id="nextBtn" onclick="changeSlide(1)">পরবর্তী ধাপ ➡️</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="support" class="content-tab">
+    <div class="box">
+      <h3>সাপোর্ট টিকিট সাবমিট</h3>
+      <form id="supportForm">
+        <label>আপনার নাম:</label>
+        <input type="text" id="cust_name" required placeholder="পুরো নাম দিন">
+
+        <label>মোবাইল নাম্বার:</label>
+        <input type="text" id="cust_phone" required placeholder="017xxxxxxxx">
+
+        <label>সমস্যার বিস্তারিত লিখুন:</label>
+        <textarea id="cust_issue" rows="4" required placeholder="কী সমস্যা হচ্ছে বিস্তারিত বলুন..."></textarea>
+
+        <label>স্ক্রিনশট ছবি (ঐচ্ছিক):</label>
+        <input type="file" id="cust_file" accept="image/*">
+
+        <button type="submit" id="submitBtn" class="btn-green">এডমিনের কাছে পাঠান</button>
+        <div id="status" class="status-msg"></div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
+    const BOT_TOKEN = "8859855010:AAEh0Rrdb8665y0v91ACP8N437B90Iu2dzk";
+    const ADMIN_CHAT_ID = "8694336266";
+
+    function openTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.content-tab').forEach(c => c.classList.remove('active'));
+      document.getElementById('btn-' + tabId).classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    if (window.location.hash === "#login") openTab('login');
+    else if (window.location.hash === "#support") openTab('support');
+    else openTab('guides');
+
+    const guidesData = {
+      login_guide: [
+        { title: "জিমেইল বসান", desc: "আপনার একাউন্ট খোলার সময় ব্যবহৃত সঠিক ইমেইলটি দিন।", img: "https://via.placeholder.com/400x250/1e293b/38bdf8?text=Step+1:+Email" },
+        { title: "পাসওয়ার্ড লিখুন", desc: "আপনার গোপন পাসওয়ার্ড সতর্কভাবে টাইপ করুন।", img: "https://via.placeholder.com/400x250/1e293b/38bdf8?text=Step+2:+Password" },
+        { title: "লগইন বাটনে চাপুন", desc: "লগইন বাটনে চাপ দিয়ে ড্যাশবোর্ডে প্রবেশ করুন।", img: "https://via.placeholder.com/400x250/1e293b/38bdf8?text=Step+3:+Login+Click" }
+      ],
+      wallet_guide: [
+        { title: "Add Money পেজে যান", desc: "মেনু থেকে Add Money অপশনে ক্লিক করুন।", img: "https://via.placeholder.com/400x250/1e293b/38bdf8?text=Step+1:+Add+Money" },
+        { title: "নাম্বারে Send Money করুন", desc: "বিকাশ বা নগদ নাম্বারে টাকা পাঠিয়ে দিন।", img: "https://via.placeholder.com/400x250/1e293b/38bdf8?text=Step+2:+Send+Money" },
+        { title: "TrxID সাবমিট দিন", desc: "মেসেজ থেকে TrxID এবং এমাউন্ট দিয়ে কনফার্ম করুন।", img: "https://via.placeholder.com/400x250/1e293b/38bdf8?text=Step+3:+Submit+TrxID" }
+      ],
+      order_guide: [
+        { title: "প্যাকেজ বাছাই", desc: "আপনার পছন্দের ইন্টারনেট বা মিনিট অফার সিলেক্ট করুন।", img: "https://via.placeholder.com/400x250/1e293b/38bdf8?text=Step+1:+Select+Pack" },
+        { title: "নাম্বার দিন", desc: "যে নাম্বারে অফার নিবেন সেই সিমের নাম্বার দিন।", img: "https://via.placeholder.com/400x250/1e293b/38bdf8?text=Step+2:+Phone+Number" },
+        { title: "অর্ডার নিশ্চিত করুন", desc: "Pay from Wallet সিলেক্ট করে অর্ডার সফল করুন।", img: "https://via.placeholder.com/400x250/1e293b/38bdf8?text=Step+3:+Confirm" }
+      ]
+    };
+
+    let currentGuide = [];
+    let currentIndex = 0;
+
+    function startSlider(key) {
+      currentGuide = guidesData[key];
+      currentIndex = 0;
+      renderSlide();
+      document.getElementById('sliderModal').style.display = 'block';
+    }
+
+    function renderSlide() {
+      const step = currentGuide[currentIndex];
+      document.getElementById('stepCounter').innerText = `ধাপ ${currentIndex + 1}/${currentGuide.length}`;
+      document.getElementById('slideImg').src = step.img;
+      document.getElementById('slideTitle').innerText = step.title;
+      document.getElementById('slideDesc').innerText = step.desc;
+      document.getElementById('prevBtn').disabled = (currentIndex === 0);
+      document.getElementById('nextBtn').innerText = (currentIndex === currentGuide.length - 1) ? "সমাপ্ত ✅" : "পরবর্তী ধাপ ➡️";
+    }
+
+    function changeSlide(dir) {
+      if (dir === 1 && currentIndex === currentGuide.length - 1) {
+        closeSlider();
+        return;
+      }
+      currentIndex += dir;
+      renderSlide();
+    }
+
+    function closeSlider() {
+      document.getElementById('sliderModal').style.display = 'none';
+    }
+
+    document.getElementById('supportForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      const status = document.getElementById('status');
+      btn.disabled = true;
+      btn.innerText = "পাঠানো হচ্ছে...";
+      status.innerText = "";
+
+      const name = document.getElementById('cust_name').value;
+      const phone = document.getElementById('cust_phone').value;
+      const issue = document.getElementById('cust_issue').value;
+      const file = document.getElementById('cust_file').files[0];
+      const user = tg.initDataUnsafe?.user;
+
+      const message = `🚨 নতুন সাপোর্ট টিকিট!\n\n👤 নাম: ${name}\n📱 ফোন: ${phone}\n🆔 টেলিগ্রাম: @${user?.username || 'N/A'} (ID: ${user?.id || 'N/A'})\n\n📝 সমস্যা:\n${issue}`;
+
+      try {
+        if (file) {
+          const fd = new FormData();
+          fd.append('chat_id', ADMIN_CHAT_ID);
+          fd.append('caption', message);
+          fd.append('photo', file);
+          await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: 'POST', body: fd });
+        } else {
+          await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: message })
+          });
+        }
+        status.style.color = "#10b981";
+        status.innerText = "আপনার সমস্যা সফলভাবে এডমিনের কাছে গেছে!";
+        document.getElementById('supportForm').reset();
+        setTimeout(() => tg.close(), 1800);
+      } catch (err) {
+        status.style.color = "#ef4444";
+        status.innerText = "মেসেজ পাঠানো যায়নি। নেট চেক করুন।";
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "এডমিনের কাছে পাঠান";
+      }
+    });
+  </script>
+</body>
+</html>
